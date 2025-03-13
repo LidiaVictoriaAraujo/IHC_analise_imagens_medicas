@@ -1,0 +1,9 @@
+- nome: João da Silva
+  dt_nascimento: 01/01/1970
+  sexo: M
+- nome: Maria da Silva
+  dt_nascimento: 01/01/1980
+  sexo: F
+- nome: José da Silva
+  dt_nascimento: 01/01/1990
+  sexo: M
