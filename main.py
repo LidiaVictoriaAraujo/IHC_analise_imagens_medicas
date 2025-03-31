@@ -5,55 +5,13 @@ from PIL import Image
 st.set_page_config(page_title="MediVisão", page_icon="🧬", layout="wide")
 st.markdown("""
     <style>
-    .main {
-        background-color: #f4fdf6;
-    }
-
-    [data-testid="stSidebar"] {
-        background-color: #d8efe0;
-    }
-
-    h1, h2, h3 {
-        color: #214c38;
-        font-family: 'Segoe UI', sans-serif;
-    }
-
-    .stButton > button {
-        background-color: #4caf7d;
-        color: white;
-        border-radius: 6px;
-    }
-
-    .stButton > button:hover {
-        background-color: #3b8e68;
-    }
-
-    /* ==== CUSTOMIZAÇÃO DO MENU LATERAL ==== */
-
-    /* Remove a bolinha do radio button */
-    div[data-testid="stSidebar"] div[role="radiogroup"] > label > div:first-child {
-        display: none !important;
-    }
-
-    /* Hover nos itens */
-    div[data-testid="stSidebar"] div[role="radiogroup"] > label:hover {
-        background-color: #b9dfc7;
-        border-radius: 6px;
-        cursor: pointer;
-    }
-
-    /* Estiliza o item selecionado */
-    div[data-testid="stSidebar"] div[role="radiogroup"] > label[data-selected="true"] {
-        background-color: #4caf7d !important;
-        color: white !important;
-        font-weight: 600;
-        border-radius: 6px;
-        padding-left: 10px;
-    }
+    .main {background-color: #f4fdf6;}
+    [data-testid="stSidebar"] {background-color: #d8efe0;}
+    h1, h2, h3 {color: #214c38; font-family: 'Segoe UI', sans-serif;}
+    .stButton > button {background-color: #4caf7d; color: white; border-radius: 6px;}
+    .stButton > button:hover {background-color: #3b8e68;}
     </style>
 """, unsafe_allow_html=True)
-
-
 
 # ========== USUÁRIOS ==========
 if 'usuarios' not in st.session_state:
@@ -62,7 +20,7 @@ if 'usuarios' not in st.session_state:
         "paciente1": {"senha": "abcd", "perfil": "paciente"},
         "admin": {"senha": "admin", "perfil": "administrador"},
         "enfermeira1": {"senha": "enf123", "perfil": "enfermeiro"},
-        "aaa": {"senha": "aaa", "perfil": "administrador"}
+        "aaa": {"senha": "aaa", "perfil": "enfermeiro"}
     }
 
 # ========== AUTENTICAÇÃO ==========
@@ -217,4 +175,3 @@ else:
         pagina_resultado()
     elif menu == "Chat Médico-Paciente":
         pagina_chat()
-
