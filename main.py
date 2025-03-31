@@ -1,15 +1,53 @@
 import streamlit as st
 from PIL import Image
+from streamlit_option_menu import option_menu
 
 # ========== CONFIG GERAL ==========
 st.set_page_config(page_title="MediVisão", page_icon="🧬", layout="wide")
 st.markdown("""
     <style>
-    .main {background-color: #f4fdf6;}
-    [data-testid="stSidebar"] {background-color: #d8efe0;}
-    h1, h2, h3 {color: #214c38; font-family: 'Segoe UI', sans-serif;}
-    .stButton > button {background-color: #4caf7d; color: white; border-radius: 6px;}
-    .stButton > button:hover {background-color: #3b8e68;}
+
+    @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&family=Raleway:ital,wght@0,100..900;1,100..900&display=swap');
+       
+    .main {
+        background-color: #FAF6EF;
+        font-family: 'Quicksand', 'Segoe UI', sans-serif;
+        font-optical-sizing: auto;
+        font-weight: <weight>;
+        font-style: normal;
+        font-size: "18px"
+    }
+
+    html, body, [class*="css"] {
+        font-family: 'Quicksand', 'Segoe UI', sans-serif;
+        font-optical-sizing: auto;
+        font-weight: <weight>;
+        font-style: normal;
+        
+    }
+
+    [data-testid="stSidebar"] {
+        background-color: #d8efe0;
+    }
+
+    h1, h2, h3 {
+        color: #214c38;
+        font-family: 'Quicksand', 'Segoe UI', sans-serif;
+        color: #7DA584;
+        font-optical-sizing: auto;
+        font-weight: <weight>;
+        font-style: normal;
+    }
+
+    .stButton > button {
+        background-color: #7DA584;
+        color: white;
+        border-radius: 6px;
+    }
+
+    .stButton > button:hover {
+        background-color: #3b8e68;
+    }
     </style>
 """, unsafe_allow_html=True)
 
@@ -31,8 +69,7 @@ def autenticar_usuario(username, senha):
     return None
 
 def login_page():
-    st.image("assets/logo.png", width=120)
-    st.title("MediVisão")
+    st.image("assets/logo.png", width=550)
     st.subheader("Sistema Inteligente de Diagnóstico Médico")
 
     with st.form("login_form"):
@@ -153,16 +190,22 @@ if not st.session_state['autenticado']:
         login_page()
 else:
     # MENU LATERAL
-    st.sidebar.image("assets/logo.png", width=100)
-    st.sidebar.title("MediVisão")
-    menu = st.sidebar.radio("Navegação", [
-        "Início", 
-        "Perfil do Paciente", 
-        "Análise de Imagens", 
-        "Imagem Analisada", 
-        "Chat Médico-Paciente"
-    ])
-    st.query_params["pagina"] = menu.lower().replace(" ", "_")
+    with st.sidebar:
+        st.image("assets/logo.png", width=250)
+        menu = option_menu(
+            "Navegação",
+            ["Início", "Perfil do Paciente", "Análise de Imagens", "Imagem Analisada", "Chat Médico-Paciente"],
+            icons=["house", "person", "upload", "image", "chat"],
+            menu_icon="cast",
+            default_index=0,
+            styles={
+                "container": {"background-color": "#d8efe0"},
+                "icon": {"color": "#214c38", "font-size": "18px"},
+                "nav-link": {"font-size": "16px", "text-align": "left", "margin": "5px", "--hover-color": "#a8d7c0"},
+                "nav-link-selected": {"background-color": "#4caf7d", "color": "white"},
+            }
+        )
+        st.query_params["pagina"] = menu.lower().replace(" ", "_")
 
     # PÁGINAS
     if menu == "Início":
