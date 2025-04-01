@@ -288,7 +288,7 @@ def pagina_prontuario_medico():
             }
         ]
 
-    # Exibir histórico
+    # Exibir histórico.
     st.markdown("### 🗂 Histórico do Prontuário")
     for item in reversed(st.session_state.prontuario_medico):
         with st.expander(f"{item['data']} - {item['autor']}"):
