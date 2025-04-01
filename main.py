@@ -1,5 +1,6 @@
 import streamlit as st
 import time
+import datetime
 from PIL import Image
 from streamlit_option_menu import option_menu
 
@@ -55,11 +56,10 @@ st.markdown("""
 # ========== USUÁRIOS ==========
 if 'usuarios' not in st.session_state:
     st.session_state.usuarios = {
-        "medico1": {"senha": "1234", "perfil": "médico"},
-        "paciente1": {"senha": "abcd", "perfil": "paciente"},
-        "admin": {"senha": "admin", "perfil": "administrador"},
-        "enfermeira1": {"senha": "enf123", "perfil": "enfermeiro"},
-        "aaa": {"senha": "aaa", "perfil": "enfermeiro"}
+        "medico": {"senha": "111", "perfil": "médico"},
+        "enfermeiro": {"senha": "111", "perfil": "enfermeiro"},
+        "paciente": {"senha": "111", "perfil": "paciente"},
+        "admin": {"senha": "111", "perfil": "administrador"},
     }
 
 # ========== AUTENTICAÇÃO ==========
@@ -148,11 +148,44 @@ def pagina_perfil():
     # Botões de ação
     col1, col2 = st.columns(2)
     with col1:
+        if st.button("Inserir prontuário"):
+            # TODO: redirecionar para a página certa
+            st.query_params["pagina_atual"] = "prontuario_medico"
+            st.info("Redireciona para a página do prontuário.")
+            st.rerun()
+    with col2:
+        if st.button("Carregar novos exames"):
+            # TODO: redirecionar para a página certa
+            st.query_params["pagina_atual"] = "analise_de_imagens"
+            st.info("Redireciona para a página de análise de imagens por AI")
+            st.rerun()        
+
+def dados_pessoais():
+    st.title("Perfil do Paciente")
+    st.image("assets/persona.png", caption="Paciente")
+    st.write("Nome: João Batista Fernandes")
+    st.write("Idade: 67 anos")
+    st.write("Última consulta: 15/03/2025")
+    st.write("Descrição Geral: Aposentado, ex-metalúrgico, hipertenso e diabético ")
+
+    st.markdown("### Histórico Médico com Alertas")
+    historico = [
+        {"data": "2024-12-01", "evento": "Lesão suspeita detectada", "alerta": True},
+        {"data": "2024-06-10", "evento": "Exame de rotina normal", "alerta": False},
+        {"data": "2023-11-03", "evento": "Primeira análise automatizada", "alerta": False}
+    ]
+    for item in historico:
+        icon = "⚠️" if item["alerta"] else "✅"
+        st.markdown(f"{icon} **{item['data']}** – {item['evento']}")
+
+        # Botões de ação
+    col1, col2 = st.columns(2)
+    with col1:
         if st.button("Alterar dados cadastrais"):
             st.info("Funcionalidade de edição em construção.")  # Aqui você pode redirecionar ou abrir um form
     with col2:
-        if st.button("Carregar novos exames"):
-            st.info("Acesse a aba 'Análise de Imagens' para enviar um novo exame.")
+        if st.button("Enviar novos exames"):
+            st.info("Foi realizado o envio de novos exames para seu médico analisar.")  
 
 def pagina_analise():
     st.title("Análise de Imagens por Inteligência Artificial")
@@ -168,7 +201,7 @@ def pagina_resultado():
     with st.spinner('Wait for it...'):
         time.sleep(5)
     st.success("Done!")
-    st.warning("⚠️ 80% de chance! ")
+    st.warning("⚠️ **80% de chance!** ")
     st.image("assets/analise.png", caption="Imagem com realce automatizado.", use_column_width=True)
     st.markdown("### Interpretação")
     st.write("O sistema detectou uma área suspeita. Avaliação adicional recomendada.")
@@ -193,6 +226,114 @@ def pagina_chat():
                 "mensagem": msg
             })
 
+def pagina_chat_enfermeiro():
+    st.title("Chat Médico-Enfermeiro")
+
+    if 'chat_log' not in st.session_state:
+        st.session_state.chat_log = []
+
+    for msg in st.session_state.chat_log:
+        st.markdown(f"**{msg['remetente']}**: {msg['mensagem']}")
+
+    with st.form("chat_form", clear_on_submit=True):
+        msg = st.text_input("Mensagem")
+        enviar = st.form_submit_button("Enviar")
+        if enviar and msg:
+            st.session_state.chat_log.append({
+                "remetente": st.session_state['perfil'].capitalize(),
+                "mensagem": msg
+            })
+
+def pagina_prontuario_medico():
+    st.title("Prontuário Médico")
+    st.markdown("📋 Registro de informações clínicas e observações médicas do paciente.")
+
+    # Inicializa o prontuário apenas uma vez
+    if "prontuario_medico" not in st.session_state:
+        st.session_state.prontuario_medico = [
+            {
+                "data": "2024-12-01 14:30",
+                "autor": "Dr. João (medico1)",
+                "texto": "Paciente relatou dores persistentes no abdômen inferior. Solicitado exame de imagem."
+            },
+            {
+                "data": "2025-03-10 09:00",
+                "autor": "Dr. João (medico1)",
+                "texto": "Resultado de tomografia aponta alteração compatível com lesão tumoral. Encaminhado para oncologia."
+            }
+        ]
+
+    # Exibir histórico
+    st.markdown("### 🗂 Histórico do Prontuário")
+    for item in reversed(st.session_state.prontuario_medico):
+        with st.expander(f"{item['data']} - {item['autor']}"):
+            st.markdown(item["texto"])
+
+    # Controle de exibição do formulário
+    if "mostrar_form_prontuario" not in st.session_state:
+        st.session_state.mostrar_form_prontuario = False
+
+    if st.button("✍️ Nova Anotação"):
+        st.session_state.mostrar_form_prontuario = True
+
+    # Formulário para nova anotação
+    if st.session_state.mostrar_form_prontuario:
+        with st.form("form_prontuario"):
+            nova_entrada = st.text_area("Descreva a evolução clínica, queixas, condutas, etc.", height=150)
+            salvar = st.form_submit_button("Salvar Anotação")
+
+            if salvar:
+                if nova_entrada.strip() == "":
+                    st.warning("Por favor, insira uma anotação.")
+                else:
+                    nova_anotacao = {
+                        "data": datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),
+                        "autor": f"{st.session_state['usuario']} ({st.session_state['perfil']})",
+                        "texto": nova_entrada
+                    }
+                    st.session_state.prontuario_medico.append(nova_anotacao)
+                    st.success("Anotação adicionada com sucesso!")
+                    st.session_state.mostrar_form_prontuario = False
+                    st.rerun()
+
+def pagina_registro_prontuario():
+    st.title("Registro de Prontuário de Enfermagem")
+    st.markdown("🩺 Registrar observações, sinais vitais, e procedimentos realizados.")
+
+def pagina_submeter_exames():
+    st.title("Submeter Novos Exames")
+    st.markdown("📤 Faça upload de exames para que seu médico possa avaliá-los.")
+    imagem = st.file_uploader("Envie um exame", type=["jpg", "png", "jpeg"])
+    if imagem:
+        st.image(imagem, use_column_width=True)
+        st.success("Exame enviado com sucesso!")
+
+def pagina_cadastro_usuario():
+    st.title("Cadastro e Atualização de Usuários")
+    st.markdown("👥 Cadastre novos médicos, enfermeiros ou pacientes.")
+
+    with st.form("cad_user_form"):
+        novo = st.text_input("Novo usuário")
+        senha = st.text_input("Senha", type="password")
+        perfil = st.selectbox("Perfil", ["médico", "paciente", "enfermeiro"])
+        cadastrar = st.form_submit_button("Cadastrar")
+
+        if cadastrar:
+            if novo in st.session_state.usuarios:
+                st.error("Usuário já existe.")
+            else:
+                st.session_state.usuarios[novo] = {"senha": senha, "perfil": perfil}
+                st.success("Usuário cadastrado!")
+
+def pagina_chamados_manutencao():
+    st.title("Chamados de Manutenção")
+    st.markdown("🔧 Registrar problemas técnicos ou solicitações de manutenção.")
+
+    chamado = st.text_area("Descreva o problema")
+    if st.button("Abrir chamado"):
+        st.success("Chamado registrado com sucesso!")
+
+
 # ========== ROTAS PRINCIPAIS ==========
 if 'autenticado' not in st.session_state:
     st.session_state['autenticado'] = False
@@ -207,13 +348,47 @@ if not st.session_state['autenticado']:
     else:
         login_page()
 else:
-    # MENU LATERAL
+    # MENU DINÂMICO POR PERFIL
     with st.sidebar:
         st.logo("assets/logo-white.png", size='large')
+
+        perfil = st.session_state['perfil']
+        paginas_por_perfil = {
+            "médico": {
+                "Início": "inicio",
+                "Perfil do Paciente": "perfil_do_paciente",
+                "Análise de Imagens": "analise_de_imagens",
+                "Resultado da Análise": "resultado_da_analise",
+                "Prontuário Médico": "prontuario_medico",
+                "Chat Médico-Paciente": "chat_medico_paciente"
+            },
+            "enfermeiro": {
+                "Início": "inicio",
+                "Perfil do Paciente": "perfil_do_paciente",
+                "Registro de Prontuário": "registro_prontuario",
+                "Prontuário Médico": "prontuario_medico",
+                "Chat Médico-Enfermeiro": "chat_medico_enfermeiro"
+            },
+            "paciente": {
+                "Início": "inicio",
+                "Dados Pessoais": "dados_pessoais",
+                "Submeter Novos Exames": "submeter_exames",
+                "Chat Médico-Paciente": "chat_medico_paciente"
+            },
+            "técnico-administrativo": {
+                "Cadastro de Usuários": "cadastro_usuario",
+                "Atualização de Usuários": "cadastro_usuario",
+                "Chamados de Manutenção": "chamados_manutencao"
+            }
+        }
+
+        menu_labels = list(paginas_por_perfil.get(perfil, {}).keys())
+        menu_values = list(paginas_por_perfil.get(perfil, {}).values())
+
         menu = option_menu(
             "MENU",
-            ["Início", "Perfil do Paciente", "Análise de Imagens", "Resultado da Análise", "Chat Médico-Paciente"],
-            icons=["house", "person", "upload", "image", "chat"],
+            menu_labels,
+            icons=["house", "person", "upload", "clipboard", "image", "chat"],
             menu_icon="cast",
             default_index=0,
             styles={
@@ -223,17 +398,17 @@ else:
                 "nav-link-selected": {"background-color": "#7DA584", "color": "white"},
             }
         )
-        st.query_params["pagina"] = menu.lower().replace(" ", "_")
 
-        st.markdown("---")  # separador visual
+        st.query_params["pagina"] = paginas_por_perfil[perfil][menu]
 
-        # BOTÃO DE LOGOUT
+        st.markdown("---")
         if st.button("Logout", key="logout", help="Sair da conta"):
             st.session_state['autenticado'] = False
             st.session_state['usuario'] = ""
             st.session_state['perfil'] = ""
             st.query_params["pagina"] = "login"
             st.rerun()
+
         
         # Aplicar a classe CSS via JavaScript injection
         st.markdown("""
@@ -254,3 +429,17 @@ else:
         pagina_resultado()
     elif menu == "Chat Médico-Paciente":
         pagina_chat()
+    elif menu == "Chat Médico-Enfermeiro":
+        pagina_chat_enfermeiro()    
+    elif menu == "Prontuário Médico":
+        pagina_prontuario_medico()
+    elif menu == "registro_prontuario":
+        pagina_registro_prontuario()
+    elif menu == "submeter_exames":
+        pagina_submeter_exames()
+    elif menu == "cadastro_usuario":
+        pagina_cadastro_usuario()
+    elif menu == "chamados_manutencao":
+        pagina_chamados_manutencao()
+    elif menu == "dados_pessoais":
+        dados_pessoais()        
