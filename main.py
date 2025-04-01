@@ -299,7 +299,7 @@ def pagina_prontuario_medico():
 
 def pagina_submeter_exames():
     st.title("Submeter Novos Exames")
-    st.markdown("📤 Faça upload de exames para que seu médico possa avaliá-los.")
+    st.markdown(" Faça upload de exames para que seu médico possa avaliá-los. 📤")
     imagem = st.file_uploader("Envie um exame", type=["jpg", "png", "jpeg"])
     if imagem:
         st.image(imagem, use_column_width=True)
@@ -429,11 +429,11 @@ else:
         pagina_chat_enfermeiro()    
     elif menu == "Prontuário Médico":
         pagina_prontuario_medico()
-    elif menu == "submeter_exames":
+    elif menu == "Submeter Novos Exames":
         pagina_submeter_exames()
     elif menu == "cadastro_usuario":
         pagina_cadastro_usuario()
     elif menu == "chamados_manutencao":
         pagina_chamados_manutencao()
-    elif menu == "dados_pessoais":
+    elif menu == "Dados Pessoais":
         dados_pessoais()        
