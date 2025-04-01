@@ -70,8 +70,8 @@ def autenticar_usuario(username, senha):
     return None
 
 def login_page():
-    st.image("assets/logo.png", width=550)
-    st.subheader("Sistema Inteligente de Diagnóstico Médico")
+    st.image("assets/logo.png", width=600)
+    st.subheader("Sistema Inteligente de Diagnóstico Médico por IA")
 
     with st.form("login_form"):
         username = st.text_input("Usuário")
@@ -155,8 +155,8 @@ def pagina_perfil():
             st.info("Acesse a aba 'Análise de Imagens' para enviar um novo exame.")
 
 def pagina_analise():
-    st.title("Análise de Imagens")
-    st.markdown("Faça upload de imagens para análise médica.")
+    st.title("Análise de Imagens por Inteligência Artificial")
+    st.markdown("Faça upload de imagens para análise médica por IA.")
 
     imagem = st.file_uploader("Enviar exame (JPG/PNG)", type=["jpg", "jpeg", "png"])
     if imagem:
