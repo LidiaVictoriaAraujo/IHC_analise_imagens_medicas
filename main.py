@@ -158,7 +158,31 @@ def pagina_perfil():
             # TODO: redirecionar para a página certa
             st.query_params["pagina_atual"] = "analise_de_imagens"
             st.info("Redireciona para a página de análise de imagens por AI")
-            st.rerun()        
+            st.rerun()
+
+def pagina_perfil_usuario():
+    st.title("Perfil do Usuário")
+    st.image("assets/persona.png", caption="Usuário")
+    st.write("Nome: João Batista Fernandes")
+    st.write("Perfil: Paciente")
+    st.write("Idade: 67 anos")
+    st.write("RG: 12345678-9")
+    st.write("CPF: 123.456.789-0")
+    st.write("Convênio: Seguros")
+    st.write("Carteirinha: 123456789-00")
+
+    # Botões de ação
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("Inserir Dados"):
+            # TODO: redirecionar para a página certa
+            st.info("Atualiza Dados.")
+            st.rerun()
+    with col2:
+        if st.button("Carregar novos documentos"):
+            # TODO: redirecionar para a página certa
+            st.info("Enviar foto de documentos.")
+            st.rerun() 
 
 def dados_pessoais():
     st.title("Perfil do Paciente")
@@ -306,7 +330,7 @@ def pagina_submeter_exames():
         st.success("Exame enviado com sucesso!")
 
 def pagina_cadastro_usuario():
-    st.title("Cadastro e Atualização de Usuários")
+    st.title("Cadastro de Usuários")
     st.markdown("👥 Cadastre novos médicos, enfermeiros ou pacientes.")
 
     with st.form("cad_user_form"):
@@ -326,7 +350,7 @@ def pagina_chamados_manutencao():
     st.title("Chamados de Manutenção")
     st.markdown("🔧 Registrar problemas técnicos ou solicitações de manutenção.")
 
-    chamado = st.text_area("Descreva o problema")
+    st.text_area("Descreva o problema")
     if st.button("Abrir chamado"):
         st.success("Chamado registrado com sucesso!")
 
@@ -371,20 +395,39 @@ else:
                 "Submeter Novos Exames": "submeter_exames",
                 "Chat Médico-Paciente": "chat_medico_paciente"
             },
-            "técnico-administrativo": {
-                "Cadastro de Usuários": "cadastro_usuario",
-                "Atualização de Usuários": "cadastro_usuario",
-                "Chamados de Manutenção": "chamados_manutencao"
+            "administrador": {
+                "Início": "inicio",
+                "Perfil do Usuário": "perfil_do_usuário",
+                "Cadastro de Usuários": "cadastro_de_usuarios",
+                "Chamados de Manutenção": "chamados_de_manutencao"
             }
         }
 
         menu_labels = list(paginas_por_perfil.get(perfil, {}).keys())
         menu_values = list(paginas_por_perfil.get(perfil, {}).values())
 
+        icon_map = {
+            "Início": "house",
+            "Perfil do Paciente": "person",
+            "Perfil do Usuário": "person",
+            "Análise de Imagens": "upload",
+            "Prontuário Médico": "clipboard",
+            "Resultado da Análise": "image",
+            "Chat Médico-Paciente": "chat",
+            "Chat Médico-Enfermeiro": "chat",
+            "Registro de Prontuário": "clipboard-check",
+            "Submeter Novos Exames": "cloud-upload",
+            "Cadastro de Usuários": "person-plus",
+            "Chamados de Manutenção": "tools",
+            "Dados Pessoais": "person"
+        }
+
+        menu_icons = [icon_map.get(label, "menu") for label in menu_labels]
+
         menu = option_menu(
             "MENU",
             menu_labels,
-            icons=["house", "person", "upload", "clipboard", "image", "chat"],
+            icons=menu_icons,
             menu_icon="cast",
             default_index=0,
             styles={
@@ -419,6 +462,8 @@ else:
         pagina_inicio()
     elif menu == "Perfil do Paciente":
         pagina_perfil()
+    elif menu == "Perfil do Usuário":
+        pagina_perfil_usuario()    
     elif menu == "Análise de Imagens":
         pagina_analise()
     elif menu == "Resultado da Análise":
@@ -431,9 +476,9 @@ else:
         pagina_prontuario_medico()
     elif menu == "Submeter Novos Exames":
         pagina_submeter_exames()
-    elif menu == "cadastro_usuario":
+    elif menu == "Cadastro de Usuários":
         pagina_cadastro_usuario()
-    elif menu == "chamados_manutencao":
+    elif menu == "Chamados de Manutenção":
         pagina_chamados_manutencao()
     elif menu == "Dados Pessoais":
         dados_pessoais()        
