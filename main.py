@@ -170,7 +170,8 @@ def pagina_resultado():
     st.success("Done!")
     st.image("assets/analise.png", caption="Imagem com realce automatizado.", use_column_width=True)
     st.markdown("### Interpretação")
-    st.write("🚨 O sistema detectou uma área suspeita. Avaliação adicional recomendada.")
+    st.warning("⚠️ 80% de chance! ")
+    st.write("O sistema detectou uma área suspeita. Avaliação adicional recomendada.")
     st.markdown("### Áudio descrição")
     st.audio("assets/resultado_analise_audio.mp3")
 
