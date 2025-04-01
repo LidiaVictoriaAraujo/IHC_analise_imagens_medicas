@@ -49,7 +49,8 @@ st.markdown("""
 
     .stButton > button:hover {
         background-color: #3b8e68;
-        border-color: white    
+        border-color: white;
+        color: white;    
     }
     </style>
 """, unsafe_allow_html=True)
@@ -59,6 +60,7 @@ if "pacientes" not in st.session_state:
     st.session_state.pacientes = {
         "joao_batista": {
             "nome": "João Batista Fernandes",
+            "foto": "assets/persona-paciente.png",
             "idade": 67,
             "condicao": "Hipertensão, Diabetes",
             "analises": [],
@@ -67,6 +69,7 @@ if "pacientes" not in st.session_state:
         },
         "maria_alves": {
             "nome": "Maria Alves",
+            "foto": "sem foto",
             "idade": 53,
             "condicao": "Pós-cirurgia abdominal",
             "analises": [],
@@ -75,6 +78,7 @@ if "pacientes" not in st.session_state:
         },
         "carlos_nunes": {
             "nome": "Carlos Nunes",
+            "foto": "sem foto",
             "idade": 71,
             "condicao": "Exame de Rotina",
             "analises": [],
@@ -165,27 +169,28 @@ def pagina_lista_pacientes():
         with st.expander(f"{dados['nome']} ({dados['idade']} anos)"):
             st.write(f"🩺 Condições clínicas: {dados['condicao']}")
             if st.button(f"Acessar {dados['nome']}", key=f"btn_{pid}"):
-                st.info("Deve redirecionar para a área do paciente")
                 st.query_params.clear()
                 st.query_params.update({"pagina": "area_do_paciente", "paciente_id": pid})
-                st.rerun()
 
 def menu_area_paciente(paciente_id):
     dados = st.session_state.pacientes[paciente_id]
-    st.sidebar.markdown(f"**{dados['nome']}**")
 
-    submenu = option_menu(
-        None,
-        ["Dados Gerais", "Análise de Imagens", "Resultado da Análise", "Prontuário Médico", "Voltar"],
-        icons=["person", "upload", "image", "clipboard", "arrow-left"],
-        default_index=0,
-        styles={
-            "container": {"background-color": "white", "flex_box":"column"},
-            "nav-link": {"--hover-color": "#a8d7c0"},
-            "nav-link-selected": {"background-color": "#7DA584", "color": "white"}
-        }
-    )
+    with st.sidebar:
+        submenu = option_menu(
+                f"{dados['nome']}",
+                ["Dados Gerais", "Análise de Imagens", "Resultado da Análise", "Prontuário Médico", "Voltar"],
+                icons=["person", "upload", "image", "clipboard", "arrow-left"],
+                default_index=0,
+                styles={
+                    "container": {"background-color": "white", "padding": "30px"},
+                    "icon": {"color": "#214c38", "font-size": "18px"},
+                    "nav-link": {"font-size": "16px", "text-align": "left", "margin": "5px", "--hover-color": "#a8d7c0"},
+                    "nav-link-selected": {"background-color": "#7DA584", "color": "white"},
+                }
+            )
+    
     return submenu
+
 
 def pagina_area_do_paciente():
     st.title("Área do Paciente")
@@ -255,10 +260,8 @@ def submenu_paciente(paciente_id, paciente):
                         st.rerun()
 
     elif submenu == "Voltar":
-        st.query_params.clear()
-        st.query_params["pagina"] = "lista_de_pacientes"
+        pagina_inicio()
         st.rerun()
-
 
 def pagina_dados_pessoais():
     st.title("Dados Pessoais")
@@ -468,7 +471,21 @@ if not st.session_state['autenticado']:
 else:
     # MENU DINÂMICO POR PERFIL
     with st.sidebar:
-        st.logo("assets/logo-white.png", size='large')
+        # Logo + Botão logout lado a lado
+        col_logo, col_space, col_logout = st.columns([3, 1, 2])
+        with col_logo:
+            st.image("assets/logo-white.png", use_column_width=True)
+        with col_space:
+            st.write("     ")    
+        with col_logout:
+            if st.button("Logout", key="logout", help="Sair"):
+                st.session_state['autenticado'] = False
+                st.session_state['usuario'] = ""
+                st.session_state['perfil'] = ""
+                st.query_params["pagina"] = "login"
+                st.rerun()
+
+        st.markdown("---")
 
         perfil = st.session_state['perfil']
         paginas_por_perfil = {
@@ -538,16 +555,6 @@ else:
 
         st.query_params["pagina"] = paginas_por_perfil[perfil][menu]
 
-        st.markdown("---")
-        if st.button("Logout", key="logout", help="Sair da conta"):
-            st.session_state['autenticado'] = False
-            st.session_state['usuario'] = ""
-            st.session_state['perfil'] = ""
-            st.query_params["pagina"] = "login"
-            st.rerun()
-
-        # A
-        # Aplicar a classe CSS via JavaScript injection
         st.markdown("""
             <script>
             const btn = window.parent.document.querySelector('button[kind="primary"][data-testid="baseButton-button"][key="logout"]');
