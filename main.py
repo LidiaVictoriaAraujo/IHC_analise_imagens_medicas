@@ -69,6 +69,7 @@ def autenticar_usuario(username, senha):
         return users[username]["perfil"]
     return None
 
+# ========== LOGIN ==========
 def login_page():
     st.image("assets/logo.png", width=600)
     st.subheader("Sistema Inteligente de Diagnóstico Médico por IA")
