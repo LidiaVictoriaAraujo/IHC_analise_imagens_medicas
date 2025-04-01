@@ -1,9 +1,5 @@
 #Arquivos de cache
 __pycache__/
 
-#Arquivos de imagem
-*.png
-*.jpg
-
 #Arquivos de texto
 text.txt
