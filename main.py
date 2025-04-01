@@ -6,6 +6,7 @@ from streamlit_option_menu import option_menu
 
 # ========== CONFIG GERAL ==========
 st.set_page_config(page_title="MediVisão", page_icon="🧬", layout="wide")
+
 st.markdown("""
     <style>
 
@@ -52,6 +53,35 @@ st.markdown("""
     }
     </style>
 """, unsafe_allow_html=True)
+
+# Dados simulados de pacientes vinculados ao médico
+if "pacientes" not in st.session_state:
+    st.session_state.pacientes = {
+        "joao_batista": {
+            "nome": "João Batista Fernandes",
+            "idade": 67,
+            "condicao": "Hipertensão, Diabetes",
+            "analises": [],
+            "resultados": [],
+            "prontuario": []
+        },
+        "maria_alves": {
+            "nome": "Maria Alves",
+            "idade": 53,
+            "condicao": "Pós-cirurgia abdominal",
+            "analises": [],
+            "resultados": [],
+            "prontuario": []
+        },
+        "carlos_nunes": {
+            "nome": "Carlos Nunes",
+            "idade": 71,
+            "condicao": "Exame de Rotina",
+            "analises": [],
+            "resultados": [],
+            "prontuario": []
+        }
+    }
 
 # ========== USUÁRIOS ==========
 if 'usuarios' not in st.session_state:
@@ -127,90 +157,146 @@ def pagina_inicio():
     st.info(f"Usuário logado: **{st.session_state['usuario']}** ({st.session_state['perfil']})")
     st.image("assets/drawing.png")
     
+def pagina_lista_pacientes():
+    st.title("Pacientes Acompanhados")
+    pacientes = st.session_state.pacientes
 
-def pagina_perfil_paciente():
-    st.title("Perfil do Paciente")
-    st.image("assets/persona.png", caption="Paciente")
-    st.write("Nome: João Batista Fernandes")
-    st.write("Idade: 67 anos")
-    st.write("Última consulta: 15/03/2025")
-    st.write("Descrição Geral: Aposentado, ex-metalúrgico, hipertenso e diabético ")
+    for pid, dados in pacientes.items():
+        with st.expander(f"{dados['nome']} ({dados['idade']} anos)"):
+            st.write(f"🩺 Condições clínicas: {dados['condicao']}")
+            if st.button(f"Acessar {dados['nome']}", key=f"btn_{pid}"):
+                st.query_params.clear()
+                st.query_params.update({"pagina": "area_paciente", "paciente_id": pid})
+                st.rerun()
 
-    st.markdown("### Histórico Médico com Alertas")
-    historico = [
-        {"data": "2024-12-01", "evento": "Lesão suspeita detectada", "alerta": True},
-        {"data": "2024-06-10", "evento": "Exame de rotina normal", "alerta": False},
-        {"data": "2023-11-03", "evento": "Primeira análise automatizada", "alerta": False}
-    ]
-    for item in historico:
-        icon = "⚠️" if item["alerta"] else "✅"
-        st.markdown(f"{icon} **{item['data']}** – {item['evento']}")
+def menu_area_paciente(paciente_id):
+    dados = st.session_state.pacientes[paciente_id]
+    st.sidebar.markdown(f"**{dados['nome']}**")
 
-    # Botões de ação
-    col1, col2 = st.columns(2)
-    with col1:
-        if st.button("Inserir prontuário"):
-            # TODO: redirecionar para a página certa
-            st.query_params["pagina_atual"] = "prontuario_medico"
-            st.info("Redireciona para a página do prontuário.")
-            st.rerun()
-    with col2:
-        if st.button("Carregar novos exames"):
-            # TODO: redirecionar para a página certa
-            st.query_params["pagina_atual"] = "analise_de_imagens"
-            st.info("Redireciona para a página de análise de imagens por AI")
-            st.rerun()
+    submenu = option_menu(
+        None,
+        ["Dados Gerais", "Análise de Imagens", "Resultado da Análise", "Prontuário Médico", "Voltar"],
+        icons=["person", "upload", "image", "clipboard", "arrow-left"],
+        default_index=0,
+        styles={
+            "container": {"background-color": "white"},
+            "nav-link": {"--hover-color": "#a8d7c0"},
+            "nav-link-selected": {"background-color": "#7DA584", "color": "white"}
+        }
+    )
+    return submenu
 
-def pagina_perfil_usuario():
-    st.title("Perfil do Usuário")
-    st.image("assets/persona.png", caption="Usuário")
-    st.write("Nome: João Batista Fernandes")
-    st.write("Perfil: Paciente")
-    st.write("Idade: 67 anos")
-    st.write("RG: 12345678-9")
-    st.write("CPF: 123.456.789-0")
-    st.write("Convênio: Seguros")
-    st.write("Carteirinha: 123456789-00")
+def pagina_area_do_paciente():
+    st.title("Área do Paciente")
+    paciente_id = st.query_params.get("paciente_id")
+    pacientes = st.session_state.pacientes
 
-    # Botões de ação
-    col1, col2 = st.columns(2)
-    with col1:
-        if st.button("Inserir Dados"):
-            # TODO: redirecionar para a página certa
-            st.info("Atualiza Dados.")
-            st.rerun()
-    with col2:
-        if st.button("Carregar novos documentos"):
-            # TODO: redirecionar para a página certa
-            st.info("Enviar foto de documentos.")
-            st.rerun() 
+    if not paciente_id or paciente_id not in pacientes:
+        st.error("Paciente não encontrado.")
+        return
 
-def dados_pessoais():
-    st.title("Perfil do Paciente")
-    st.image("assets/persona.png", caption="Paciente")
-    st.write("Nome: João Batista Fernandes")
-    st.write("Idade: 67 anos")
-    st.write("Última consulta: 15/03/2025")
-    st.write("Descrição Geral: Aposentado, ex-metalúrgico, hipertenso e diabético ")
+    submenu = menu_area_paciente(paciente_id)
+    paciente = pacientes[paciente_id]
 
-    st.markdown("### Histórico Médico com Alertas")
-    historico = [
-        {"data": "2024-12-01", "evento": "Lesão suspeita detectada", "alerta": True},
-        {"data": "2024-06-10", "evento": "Exame de rotina normal", "alerta": False},
-        {"data": "2023-11-03", "evento": "Primeira análise automatizada", "alerta": False}
-    ]
-    for item in historico:
-        icon = "⚠️" if item["alerta"] else "✅"
-        st.markdown(f"{icon} **{item['data']}** – {item['evento']}")
+    if submenu == "Dados Gerais":
+        st.title(f"{paciente['nome']} - Dados do Paciente")
+        st.write(f"Idade: {paciente['idade']}")
+        st.write(f"Condições: {paciente['condicao']}")
 
-        # Botões de ação
-    col1, col2 = st.columns(2)
-    with col1:
-        if st.button("Alterar dados cadastrais"):
-            st.info("Funcionalidade de edição em construção.")  # Aqui você pode redirecionar ou abrir um form
-    with col2:
-        if st.button("Enviar novos exames"):
-            st.info("Foi realizado o envio de novos exames para seu médico analisar.")  
+    elif submenu == "Análise de Imagens":
+        st.title(f"Análise de Imagens - {paciente['nome']}")
+        imagem = st.file_uploader("Enviar imagem de exame", type=["jpg", "jpeg", "png"])
+        if imagem:
+            paciente["analises"].append(imagem)
+            st.image(imagem, caption="Imagem enviada", use_column_width=True)
+            st.success("Imagem vinculada ao paciente.")
+
+    elif submenu == "Resultado da Análise":
+        st.title(f"Resultado da Análise - {paciente['nome']}")
+        st.image("assets/analise.png", caption="Imagem segmentada", use_column_width=True)
+        st.audio("assets/resultado_analise_audio.mp3")
+        paciente["resultados"].append("Resultado automático registrado.")
+        st.success("Resultado registrado.")
+
+    elif submenu == "Prontuário Médico":
+        st.title(f"Prontuário Médico - {paciente['nome']}")
+        prontuario = paciente["prontuario"]
+
+        for item in reversed(prontuario):
+            with st.expander(f"{item['data']} - {item['autor']}"):
+                st.markdown(item["texto"])
+
+        if st.button("✍️ Nova Anotação"):
+            st.session_state["mostrar_form"] = True
+
+        if st.session_state.get("mostrar_form", False):
+            with st.form("form_prontuario"):
+                texto = st.text_area("Evolução clínica", height=150)
+                if st.form_submit_button("Salvar"):
+                    if texto.strip():
+                        anotacao = {
+                            "data": datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),
+                            "autor": f"{st.session_state['usuario']} ({st.session_state['perfil']})",
+                            "texto": texto
+                        }
+                        prontuario.append(anotacao)
+                        st.success("Anotação registrada.")
+                        st.session_state["mostrar_form"] = False
+                        st.rerun()
+
+    elif submenu == "Voltar":
+        st.query_params.clear()
+        st.query_params["pagina"] = "lista_de_pacientes"
+        st.rerun()
+
+
+def pagina_dados_pessoais():
+    st.title("Dados Pessoais")
+    
+    usuario = st.session_state.get("usuario", "usuário")
+    perfil = st.session_state.get("perfil", "indefinido")
+
+    st.write(f"Usuário: `{usuario}`")
+    st.write(f"Perfil: `{perfil}`")
+
+    if perfil == "médico":
+        st.image("assets/persona-medica.png", caption="Usuário")
+        st.write("Nome completo: Helena Cavalcante Santos")
+        st.write("Especialidade: Clínica Geral")
+        st.write("CRM: 123456-SP")
+        st.write("Email: medico@medivisao.com")
+    elif perfil == "enfermeiro":
+        st.image("assets/persona-enfermeira.png", caption="Usuário")
+        st.write("Nome completo: Elisangela Cordeiro Botari Freitas")
+        st.write("Coren: 78910-SP")
+        st.write("Setor: Enfermagem Clínica")
+        st.write("Email: enfermeiro@medivisao.com")
+    elif perfil == "paciente":
+        st.image("assets/persona-paciente.png", caption="Usuário")
+        st.write("Nome completo: João Batista Fernandes")
+        st.write("Idade: 67")
+        st.write("Condições: Hipertensão, Diabetes")
+    elif perfil == "administrador":
+        st.image("assets/persona-ta.png", caption="Usuário")
+        st.write("Nome completo: João Batista Fernandes")
+        st.write("Cargo: Técnico Administrativo")
+        st.write("Permissões: Gerenciar usuários, criar chamados")
+
+    st.markdown("---")
+    if st.button("Editar meus dados"):
+        st.info("Funcionalidade de edição em desenvolvimento.")
+
+def pagina_lista_usuarios():
+    st.title("Gerenciamento de Usuários")
+    st.markdown("🔧 Lista de todos os usuários registrados no sistema.")
+
+    usuarios = st.session_state.get("usuarios", {})
+    
+    for nome, dados in usuarios.items():
+        with st.expander(f"👤 {nome} ({dados['perfil']})"):
+            st.write(f"🔐 Senha: `{dados['senha']}`")  # Apenas exemplo — **não exiba senhas em sistemas reais**
+            if st.button(f"Editar {nome}", key=f"editar_{nome}"):
+                st.info("Funcionalidade de edição em construção.") 
 
 def pagina_analise():
     st.title("Análise de Imagens por Inteligência Artificial")
@@ -228,9 +314,9 @@ def pagina_resultado():
     st.success("Done!")
     st.warning("⚠️ **80% de chance!** ")
     st.image("assets/analise.png", caption="Imagem com realce automatizado.", use_column_width=True)
-    st.markdown("### Interpretação")
+    st.markdown("Interpretação")
     st.write("O sistema detectou uma área suspeita. Avaliação adicional recomendada.")
-    st.markdown("### Áudio descrição")
+    st.markdown("Áudio descrição")
     st.audio("assets/resultado_analise_audio.mp3")
 
 def pagina_chat():
@@ -332,7 +418,7 @@ def pagina_submeter_exames():
 
 def pagina_cadastro_usuario():
     st.title("Cadastro de Usuários")
-    st.markdown("👥 Cadastre novos médicos, enfermeiros ou pacientes.")
+    st.markdown("Cadastre novos médicos, enfermeiros ou pacientes.")
 
     with st.form("cad_user_form"):
         novo = st.text_input("Novo usuário")
@@ -378,15 +464,14 @@ else:
         paginas_por_perfil = {
             "médico": {
                 "Início": "inicio",
-                "Perfil do Paciente": "perfil_do_paciente",
-                "Análise de Imagens": "analise_de_imagens",
-                "Resultado da Análise": "resultado_da_analise",
-                "Prontuário Médico": "prontuario_medico",
-                "Chat Médico-Paciente": "chat_medico_paciente"
+                "Dados Pessoais": "dados_pessoais",
+                "Lista de Pacientes": "lista_de_pacientes",
+                "Área do Paciente": "area_do_paciente",
             },
             "enfermeiro": {
                 "Início": "inicio",
-                "Perfil do Paciente": "perfil_do_paciente",
+                "Dados Pessoais": "dados_pessoais",
+                "Lista de Pacientes": "lista_de_pacientes",
                 "Prontuário Médico": "prontuario_medico",
                 "Chat Médico-Enfermeiro": "chat_medico_enfermeiro"
             },
@@ -398,7 +483,8 @@ else:
             },
             "administrador": {
                 "Início": "inicio",
-                "Perfil do Usuário": "perfil_do_usuário",
+                "Dados Pessoais": "dados_pessoais",
+                "Lista de Usuários": "lista_de_usuários",
                 "Cadastro de Usuários": "cadastro_de_usuarios",
                 "Chamados de Manutenção": "chamados_de_manutencao"
             }
@@ -409,9 +495,10 @@ else:
 
         icon_map = {
             "Início": "house",
-            "Perfil do Paciente": "person",
-            "Perfil do Usuário": "person",
+            "Lista de Pacientes": "people",
+            "Lista de Usuários": "people",
             "Análise de Imagens": "upload",
+            "Área do Paciente:": "person-plus",
             "Prontuário Médico": "clipboard",
             "Resultado da Análise": "image",
             "Chat Médico-Paciente": "chat",
@@ -461,10 +548,10 @@ else:
     # PÁGINAS
     if menu == "Início":
         pagina_inicio()
-    elif menu == "Perfil do Paciente":
-        pagina_perfil_paciente()
-    elif menu == "Perfil do Usuário":
-        pagina_perfil_usuario()    
+    elif menu == "Lista de Pacientes":
+        pagina_lista_pacientes()
+    elif menu == "Lista de Usuários":
+        pagina_lista_usuarios()    
     elif menu == "Análise de Imagens":
         pagina_analise()
     elif menu == "Resultado da Análise":
@@ -482,4 +569,7 @@ else:
     elif menu == "Chamados de Manutenção":
         pagina_chamados_manutencao()
     elif menu == "Dados Pessoais":
-        dados_pessoais()        
+        pagina_dados_pessoais()
+    elif menu == "Área do Paciente":
+        pagina_area_do_paciente()
+            
