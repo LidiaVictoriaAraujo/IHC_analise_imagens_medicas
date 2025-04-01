@@ -246,7 +246,7 @@ def pagina_chat_enfermeiro():
 
 def pagina_prontuario_medico():
     st.title("Prontuário Médico")
-    st.markdown("📋 Registro de informações clínicas e observações médicas do paciente.")
+    st.markdown("Registro de informações clínicas e observações médicas do paciente.")
 
     # Inicializa o prontuário apenas uma vez
     if "prontuario_medico" not in st.session_state:
@@ -296,9 +296,6 @@ def pagina_prontuario_medico():
                     st.session_state.mostrar_form_prontuario = False
                     st.rerun()
 
-def pagina_registro_prontuario():
-    st.title("Registro de Prontuário de Enfermagem")
-    st.markdown("🩺 Registrar observações, sinais vitais, e procedimentos realizados.")
 
 def pagina_submeter_exames():
     st.title("Submeter Novos Exames")
@@ -365,7 +362,6 @@ else:
             "enfermeiro": {
                 "Início": "inicio",
                 "Perfil do Paciente": "perfil_do_paciente",
-                "Registro de Prontuário": "registro_prontuario",
                 "Prontuário Médico": "prontuario_medico",
                 "Chat Médico-Enfermeiro": "chat_medico_enfermeiro"
             },
@@ -433,8 +429,6 @@ else:
         pagina_chat_enfermeiro()    
     elif menu == "Prontuário Médico":
         pagina_prontuario_medico()
-    elif menu == "registro_prontuario":
-        pagina_registro_prontuario()
     elif menu == "submeter_exames":
         pagina_submeter_exames()
     elif menu == "cadastro_usuario":
