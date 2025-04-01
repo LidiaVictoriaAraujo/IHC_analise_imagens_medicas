@@ -1,4 +1,5 @@
 import streamlit as st
+import time
 from PIL import Image
 from streamlit_option_menu import option_menu
 
@@ -164,7 +165,10 @@ def pagina_analise():
 
 def pagina_resultado():
     st.title("Resultado da Análise")
-    st.image("assets/analise.png", caption="Imagem com realce automatizado", use_column_width=True)
+    with st.spinner('Wait for it...'):
+        time.sleep(5)
+    st.success("Done!")
+    st.image("assets/analise.png", caption="Imagem com realce automatizado.", use_column_width=True)
     st.markdown("### Interpretação")
     st.write("🚨 O sistema detectou uma área suspeita. Avaliação adicional recomendada.")
     st.markdown("### Áudio descrição")
