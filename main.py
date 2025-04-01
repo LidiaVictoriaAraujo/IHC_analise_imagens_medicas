@@ -546,7 +546,7 @@ else:
             st.query_params["pagina"] = "login"
             st.rerun()
 
-        
+        # A
         # Aplicar a classe CSS via JavaScript injection
         st.markdown("""
             <script>
