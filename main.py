@@ -123,6 +123,8 @@ def pagina_inicio():
     st.title("Início")
     st.markdown("Bem-vindo ao **MediVisão**, sua plataforma de apoio ao diagnóstico por imagem.")
     st.info(f"Usuário logado: **{st.session_state['usuario']}** ({st.session_state['perfil']})")
+    st.image("assets/drawing.png")
+    
 
 def pagina_perfil():
     st.title("Perfil do Paciente")
