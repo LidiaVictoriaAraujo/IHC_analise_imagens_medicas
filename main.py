@@ -171,7 +171,8 @@ def pagina_lista_pacientes():
             if st.button(f"Acessar {dados['nome']}", key=f"btn_{pid}"):
                 st.query_params.clear()
                 st.query_params.update({"pagina": "area_do_paciente", "paciente_id": pid})
-                pagina_area_do_paciente()
+                st.info("Acesse **Área do Paciente** no menu lateral!")
+                
 
 def menu_area_paciente(paciente_id):
     dados = st.session_state.pacientes[paciente_id]
