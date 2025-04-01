@@ -165,8 +165,9 @@ def pagina_lista_pacientes():
         with st.expander(f"{dados['nome']} ({dados['idade']} anos)"):
             st.write(f"🩺 Condições clínicas: {dados['condicao']}")
             if st.button(f"Acessar {dados['nome']}", key=f"btn_{pid}"):
+                st.info("Deve redirecionar para a área do paciente")
                 st.query_params.clear()
-                st.query_params.update({"pagina": "area_paciente", "paciente_id": pid})
+                st.query_params.update({"pagina": "area_do_paciente", "paciente_id": pid})
                 st.rerun()
 
 def menu_area_paciente(paciente_id):
@@ -179,7 +180,7 @@ def menu_area_paciente(paciente_id):
         icons=["person", "upload", "image", "clipboard", "arrow-left"],
         default_index=0,
         styles={
-            "container": {"background-color": "white"},
+            "container": {"background-color": "white", "flex_box":"column"},
             "nav-link": {"--hover-color": "#a8d7c0"},
             "nav-link-selected": {"background-color": "#7DA584", "color": "white"}
         }
@@ -190,21 +191,28 @@ def pagina_area_do_paciente():
     st.title("Área do Paciente")
     paciente_id = st.query_params.get("paciente_id")
     pacientes = st.session_state.pacientes
-
+    dados = st.session_state.pacientes[paciente_id]
+    st.info(f"**{dados['nome']}**")
+    
     if not paciente_id or paciente_id not in pacientes:
         st.error("Paciente não encontrado.")
         return
-
-    submenu = menu_area_paciente(paciente_id)
+    
     paciente = pacientes[paciente_id]
+    submenu_paciente(paciente_id, paciente)
+
+def submenu_paciente(paciente_id, paciente):
+    submenu = menu_area_paciente(paciente_id)
 
     if submenu == "Dados Gerais":
-        st.title(f"{paciente['nome']} - Dados do Paciente")
+        st.title("Dados do Paciente")
+        st.write(f"Nome: {paciente['nome']}")
         st.write(f"Idade: {paciente['idade']}")
         st.write(f"Condições: {paciente['condicao']}")
 
     elif submenu == "Análise de Imagens":
-        st.title(f"Análise de Imagens - {paciente['nome']}")
+        st.title(f"Análise de Imagens")
+        st.write(f"Nome: {paciente['nome']}")
         imagem = st.file_uploader("Enviar imagem de exame", type=["jpg", "jpeg", "png"])
         if imagem:
             paciente["analises"].append(imagem)
@@ -212,14 +220,16 @@ def pagina_area_do_paciente():
             st.success("Imagem vinculada ao paciente.")
 
     elif submenu == "Resultado da Análise":
-        st.title(f"Resultado da Análise - {paciente['nome']}")
+        st.title(f"Resultado da Análise")
+        st.write(f"Nome: {paciente['nome']}")
         st.image("assets/analise.png", caption="Imagem segmentada", use_column_width=True)
         st.audio("assets/resultado_analise_audio.mp3")
         paciente["resultados"].append("Resultado automático registrado.")
         st.success("Resultado registrado.")
 
     elif submenu == "Prontuário Médico":
-        st.title(f"Prontuário Médico - {paciente['nome']}")
+        st.title(f"Prontuário Médico")
+        st.write(f"Nome: {paciente['nome']}")
         prontuario = paciente["prontuario"]
 
         for item in reversed(prontuario):
@@ -572,4 +582,3 @@ else:
         pagina_dados_pessoais()
     elif menu == "Área do Paciente":
         pagina_area_do_paciente()
-            
