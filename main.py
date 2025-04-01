@@ -163,7 +163,7 @@ def pagina_analise():
         st.success("Imagem carregada com sucesso. Pronta para análise.")
 
 def pagina_resultado():
-    st.title("Imagem Analisada")
+    st.title("Resultado da Análise")
     st.image("assets/analise.png", caption="Imagem com realce automatizado", use_column_width=True)
     st.markdown("### Interpretação")
     st.write("🚨 O sistema detectou uma área suspeita. Avaliação adicional recomendada.")
