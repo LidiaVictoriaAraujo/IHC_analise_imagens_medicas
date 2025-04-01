@@ -128,7 +128,7 @@ def pagina_inicio():
     st.image("assets/drawing.png")
     
 
-def pagina_perfil():
+def pagina_perfil_paciente():
     st.title("Perfil do Paciente")
     st.image("assets/persona.png", caption="Paciente")
     st.write("Nome: João Batista Fernandes")
@@ -462,7 +462,7 @@ else:
     if menu == "Início":
         pagina_inicio()
     elif menu == "Perfil do Paciente":
-        pagina_perfil()
+        pagina_perfil_paciente()
     elif menu == "Perfil do Usuário":
         pagina_perfil_usuario()    
     elif menu == "Análise de Imagens":
