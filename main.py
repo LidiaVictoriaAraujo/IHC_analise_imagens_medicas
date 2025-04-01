@@ -23,11 +23,10 @@ st.markdown("""
         font-optical-sizing: auto;
         font-weight: <weight>;
         font-style: normal;
-        
     }
 
     [data-testid="stSidebar"] {
-        background-color: #d8efe0;
+        background-color: #7DA584;
     }
 
     h1, h2, h3 {
@@ -47,6 +46,7 @@ st.markdown("""
 
     .stButton > button:hover {
         background-color: #3b8e68;
+        border-color: white    
     }
     </style>
 """, unsafe_allow_html=True)
@@ -102,7 +102,7 @@ def cadastro_page():
     with st.form("cadastro_form"):
         novo_usuario = st.text_input("Nome de usuário")
         nova_senha = st.text_input("Senha", type="password")
-        perfil = st.selectbox("Perfil", ["médico", "paciente"])
+        perfil = st.selectbox("Perfil", ["médico", "paciente", "enfermeiro", "técnico-administrativo"])
         cadastrar = st.form_submit_button("Cadastrar")
 
         if cadastrar:
@@ -126,9 +126,11 @@ def pagina_inicio():
 
 def pagina_perfil():
     st.title("Perfil do Paciente")
-    st.write("Nome: João Silva")
-    st.write("Idade: 52 anos")
+    st.image("assets/persona.png", caption="Paciente")
+    st.write("Nome: João Batista Fernandes")
+    st.write("Idade: 67 anos")
     st.write("Última consulta: 15/03/2025")
+    st.write("Descrição Geral: Aposentado, ex-metalúrgico, hipertenso e diabético ")
 
     st.markdown("### Histórico Médico com Alertas")
     historico = [
@@ -139,6 +141,15 @@ def pagina_perfil():
     for item in historico:
         icon = "⚠️" if item["alerta"] else "✅"
         st.markdown(f"{icon} **{item['data']}** – {item['evento']}")
+
+    # Botões de ação
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("Alterar dados cadastrais"):
+            st.info("Funcionalidade de edição em construção.")  # Aqui você pode redirecionar ou abrir um form
+    with col2:
+        if st.button("Carregar novos exames"):
+            st.info("Acesse a aba 'Análise de Imagens' para enviar um novo exame.")
 
 def pagina_analise():
     st.title("Análise de Imagens")
@@ -151,11 +162,11 @@ def pagina_analise():
 
 def pagina_resultado():
     st.title("Imagem Analisada")
-    st.image("https://cdn.pixabay.com/photo/2018/08/30/13/00/medical-3648863_1280.jpg", caption="Imagem com realce automatizado", use_column_width=True)
+    st.image("assets/analise.png", caption="Imagem com realce automatizado", use_column_width=True)
     st.markdown("### Interpretação")
-    st.write("O sistema detectou uma área suspeita. Avaliação adicional recomendada.")
+    st.write("🚨 O sistema detectou uma área suspeita. Avaliação adicional recomendada.")
     st.markdown("### Áudio descrição")
-    st.audio("https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3")
+    st.audio("assets/resultado_analise_audio.mp3")
 
 def pagina_chat():
     st.title("Chat Médico-Paciente")
@@ -191,21 +202,39 @@ if not st.session_state['autenticado']:
 else:
     # MENU LATERAL
     with st.sidebar:
-        st.image("assets/logo.png", width=250)
+        st.logo("assets/logo-white.png", size='large')
         menu = option_menu(
-            "Navegação",
-            ["Início", "Perfil do Paciente", "Análise de Imagens", "Imagem Analisada", "Chat Médico-Paciente"],
+            "MENU",
+            ["Início", "Perfil do Paciente", "Análise de Imagens", "Resultado da Análise", "Chat Médico-Paciente"],
             icons=["house", "person", "upload", "image", "chat"],
             menu_icon="cast",
             default_index=0,
             styles={
-                "container": {"background-color": "#d8efe0"},
+                "container": {"background-color": "white", "padding": "30px"},
                 "icon": {"color": "#214c38", "font-size": "18px"},
                 "nav-link": {"font-size": "16px", "text-align": "left", "margin": "5px", "--hover-color": "#a8d7c0"},
-                "nav-link-selected": {"background-color": "#4caf7d", "color": "white"},
+                "nav-link-selected": {"background-color": "#7DA584", "color": "white"},
             }
         )
         st.query_params["pagina"] = menu.lower().replace(" ", "_")
+
+        st.markdown("---")  # separador visual
+
+        # BOTÃO DE LOGOUT
+        if st.button("Logout", key="logout", help="Sair da conta"):
+            st.session_state['autenticado'] = False
+            st.session_state['usuario'] = ""
+            st.session_state['perfil'] = ""
+            st.query_params["pagina"] = "login"
+            st.rerun()
+        
+        # Aplicar a classe CSS via JavaScript injection
+        st.markdown("""
+            <script>
+            const btn = window.parent.document.querySelector('button[kind="primary"][data-testid="baseButton-button"][key="logout"]');
+            if (btn) btn.className += " logout-button";
+            </script>
+        """, unsafe_allow_html=True)    
 
     # PÁGINAS
     if menu == "Início":
@@ -214,7 +243,7 @@ else:
         pagina_perfil()
     elif menu == "Análise de Imagens":
         pagina_analise()
-    elif menu == "Imagem Analisada":
+    elif menu == "Resultado da Análise":
         pagina_resultado()
     elif menu == "Chat Médico-Paciente":
         pagina_chat()
