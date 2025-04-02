@@ -229,6 +229,7 @@ def submenu_paciente(paciente_id, paciente):
     elif submenu == "Resultado da Análise":
         st.title(f"Resultado da Análise")
         st.write(f"Nome: {paciente['nome']}")
+        st.warning("⚠️ 80% de chance de detecção de anomalia.")
         st.image("assets/analise.png", caption="Imagem segmentada", use_column_width=True)
         st.audio("assets/resultado_analise_audio.mp3")
         paciente["resultados"].append("Resultado automático registrado.")
